@@ -4,196 +4,213 @@
 <canvas id="game" width="800px" height="800px" />
 
 <script>
-    var Snake = function() {
-        this.type = Snake,
-            this.__prototype__ = "snake",
-            this.padding = 5,
-            this.velocity = 1,
-            this.item_size = 8,
-            this.x_move = this.velocity,
-            this.y_move = 0,
-            this.max_x = 800,
-            this.max_y = 800,
-            this.snake_body = [
-                [50, 50],
-                [45, 50],
-                [40, 50],
-                [35, 50],
-                [30, 50],
-            ],
-            this.canva_context,
-            this.move_snake_body = function() {
-                with(this) {
-                    for (i = 0; i < snake_body.length - 1; i++) {
-                        snake_body[i][0] = snake_body[i + 1][0];
-                        snake_body[i][1] = snake_body[i + 1][1];
+    var SnakeGame = function(context) {
+        this.max_x = context.canvas.width,
+            this.max_y = context.canvas.height,
+            this.context2d = context,
+            this.backgroundColor = '#CCC',
+            this.is_run = false,
+            this.snake = {
+                color: '#556677',
+                padding: 5,
+                velocity: 1,
+                item_size: 8,
+                x_move: 1,
+                y_move: 0,
+                snake_body: [
+                    [50, 50],
+                    [45, 50],
+                    [40, 50],
+                    [35, 50],
+                    [30, 50],
+                ],
+                recalc_loop: null,
+                timer_speed: 100,
+                update_position: function() {
+                    for (i = 0; i < this.snake_body.length - 1; i++) {
+                        this.snake_body[i][0] = this.snake_body[i + 1][0];
+                        this.snake_body[i][1] = this.snake_body[i + 1][1];
                     }
-                    new_x = snake_body[snake_body.length - 1][0] + x_move * (item_size + padding);
-                    new_y = snake_body[snake_body.length - 1][1] + y_move * (item_size + padding);
-                    if (new_x < 10) {
-                        new_x = max_x;
-                    } else if (new_y < 10) {
-                        new_y = max_y;
-                    } else if (new_x > max_x - 10) {
-                        new_x = 0;
-                    } else if (new_y > max_y - 10) {
-                        new_y = 0;
+                    new_x = this.snake_body[this.snake_body.length - 1][0] + this.x_move * (this.item_size + this.padding);
+                    new_y = this.snake_body[this.snake_body.length - 1][1] + this.y_move * (this.item_size + this.padding);
+                    if (new_x < this.item_size + this.padding) {
+                        new_x = this.parent.max_x - (this.item_size + this.padding);
+                    } else if (new_y < this.item_size + this.padding) {
+                        new_y = this.parent.max_y - (this.item_size + this.padding);
+                    } else if (new_x > this.parent.max_x - (this.item_size + this.padding)) {
+                        new_x = this.item_size + this.padding;
+                    } else if (new_y > this.parent.max_y - (this.item_size + this.padding)) {
+                        new_y = this.item_size + this.padding;
                     }
-                    snake_body[snake_body.length - 1][0] = new_x;
-                    snake_body[snake_body.length - 1][1] = new_y;
-                }
-            },
-            this.clear_before_move = function() {
-                with(this) {
-                    canva_context.beginPath();
-                    canva_context.fillStyle = '#AABBCC';
-                    canva_context.rect(0, 0, max_x, max_y);
-                    canva_context.fill();
-                    canva_context.closePath();
-                    /*canva_context.fillStyle = "#FF0000";
-                    canva_context.rect(snake_body[0][0], snake_body[0][1], 4, 4);
-                    canva_context.rect(snake_body[snake_body.length - 1][0], snake_body[snake_body.length - 1], 4, 4);
-                    canva_context.fill();*/
-                }
-            },
-            this.draw = function() {
-                with(this) {
-                    snake_body.forEach(function(item) {
-                        canva_context.beginPath();
-                        canva_context.fillStyle = "#334455";
-                        canva_context.rect(item[0], item[1], item_size, item_size);
-                        canva_context.fill();
-                        canva_context.closePath();
-                    });
-
-                }
-            },
-            this.setdirection = function(direction) {
-                with(this) {
+                    this.snake_body[this.snake_body.length - 1][0] = new_x;
+                    this.snake_body[this.snake_body.length - 1][1] = new_y;
+                },
+                set_snake_direction: function(direction) {
                     switch (direction) {
                         case "ArrowUp":
-                            y_move = -velocity;
-                            x_move = 0;
+                            if (this.y_move > 0) {
+                                this.snake_body = this.snake_body.reverse();
+                            }
+                            this.y_move = -this.velocity;
+                            this.x_move = 0;
                             break;
                         case "ArrowDown":
-                            y_move = velocity;
-                            x_move = 0;
+                            if (this.y_move < 0) {
+                                this.snake_body = this.snake_body.reverse();
+                            }
+                            this.y_move = this.velocity;
+                            this.x_move = 0;
                             break;
                         case "ArrowLeft":
-                            x_move = -velocity;
-                            y_move = 0;
+                            if (this.x_move > 0) {
+                                this.snake_body = this.snake_body.reverse();
+                            }
+                            this.x_move = -this.velocity;
+                            this.y_move = 0;
                             break;
                         case "ArrowRight":
-                            x_move = velocity;
-                            y_move = 0;
+                            if (this.x_move < 0) {
+                                this.snake_body = this.snake_body.reverse();
+                            }
+                            this.x_move = this.velocity;
+                            this.y_move = 0;
                             break;
                     }
-                }
-            },
-            this.makeSnakeLonger = function() {
-                with(this) {
-                    snake_body.push([snake_body[snake_body.length - 1][0] + x_move * (item_size + padding), snake_body[snake_body.length - 1][1] + y_move * (item_size + padding)]);
-                }
-            },
-            this.isEating = function(eatme) {
-                with(this) {
-                    if ((snake_body[snake_body.length - 1][0] < eatme.x + eatme.item_size && snake_body[snake_body.length - 1][0] + item_size > eatme.x &&
-                            snake_body[snake_body.length - 1][1] < eatme.y + eatme.item_size && snake_body[snake_body.length - 1][1] + item_size > eatme.y) ||
-                        (snake_body[0][0] < eatme.x + eatme.item_size && snake_body[0][0] + item_size > eatme.x &&
-                            snake_body[0][1] < eatme.y + eatme.item_size && snake_body[0][1] + item_size > eatme.y)) {
-                        makeSnakeLonger();
-                        eatme.refresh();
+                },
+                increase_snake: function() {
+                    this.snake_body.push([
+                        this.snake_body[this.snake_body.length - 1][0] + this.x_move * (this.item_size + this.padding),
+                        this.snake_body[this.snake_body.length - 1][1] + this.y_move * (this.item_size + this.padding)
+                    ]);
+                },
+                is_snake_collide: function(collidable) {
+                    if ((this.snake_body[this.snake_body.length - 1][0] < collidable.x + collidable.width && this.snake_body[this.snake_body.length - 1][0] + this.item_size > collidable.x &&
+                            this.snake_body[this.snake_body.length - 1][1] < collidable.y + collidable.height && this.snake_body[this.snake_body.length - 1][1] + this.item_size > collidable.y)) {
                         return true;
-                    } else {
-                        /* canva_context.beginPath();
-                         canva_context.fillStyle = "#FF00FF";
-                         canva_context.rect(snake_body[snake_body.length - 1][0] - padding, snake_body[snake_body.length - 1][1] - padding, padding * 2 + item_size, padding * 2 + item_size);
-                         canva_context.fill();
-                         canva_context.closePath();*/
+                    }
+                    return false;
+                },
+            },
+            this.candy = {
+                color: '#119900',
+                x: 0,
+                y: 0,
+                width: 12,
+                height: 12,
+                visible: true,
+                recalc_loop: null,
+                timer_speed: 500,
+                refresh_position: function() {
+                    this.x = Math.floor((Math.random() * (this.parent.max_x - this.width)));
+                    this.y = Math.floor((Math.random() * (this.parent.max_y - this.height)));
+                }
+            },
+            this.draw_candy = function() {
+                this.context2d.beginPath();
+                if (this.candy.is_visible) {
+                    this.context2d.fillStyle = this.candy.color;
+                } else {
+                    this.context2d.fillStyle = this.backgroundColor;
+                }
+                this.context2d.rect(this.candy.x, this.candy.y, this.candy.width, this.candy.height);
+                this.context2d.fill();
+                this.context2d.closePath();
+            },
+            this.draw_snake = function() {
+                var self = this;
+                this.snake.snake_body.forEach(function(item) {
+                    self.context2d.beginPath();
+                    self.context2d.fillStyle = self.snake.color;
+                    self.context2d.rect(item[0], item[1], self.snake.item_size, self.snake.item_size);
+                    self.context2d.fill();
+                    self.context2d.closePath();
+                });
+            },
+            this.snake_and_candy_collided = function() {
+                this.candy.refresh_position();
+                this.snake.increase_snake();
+                if (this.snake.snake_body.timer_speed > 40) {
+                    this.snake.snake_body.timer_speed--;
+                }
+                this.refresh_snake_timer();
+            },
+            this.get_snake_timer = function() {
+                var self = this;
+                return setInterval(function() {
+                    self.snake.update_position();
+                    if (self.snake.is_snake_collide(self.candy)) {
+                        self.snake_and_candy_collided();
                     }
 
-
+                    requestAnimationFrame(function() {
+                        self.draw();
+                    });
+                }, this.snake.timer_speed);
+            },
+            this.refresh_snake_timer = function() {
+                if (this.snake.recalc_loop != null) {
+                    clearInterval(this.snake.recalc_loop);
+                }
+                this.snake.recalc_loop = this.get_snake_timer();
+            },
+            this.get_candy_timer = function() {
+                var self = this;
+                return setInterval(function() {
+                    self.candy.is_visible = !self.candy.is_visible;
+                    requestAnimationFrame(function() {
+                        self.draw();
+                    });
+                }, this.candy.timer_speed);
+            },
+            this.refresh_candy_timer = function() {
+                if (this.candy.recalc_loop != null) {
+                    clearInterval(this.candy.recalc_loop);
+                }
+                this.candy.recalc_loop = this.get_candy_timer();
+            },
+            this.run = function() {
+                if (!this.is_run) {
+                    this.snake.parent = this;
+                    this.candy.parent = this;
+                    this.is_run = true;
+                    this.candy.refresh_position();
+                    this.set_key_handler();
+                    this.refresh_snake_timer();
+                    this.refresh_candy_timer();
+                    this.draw();
+                    /*window.requestAnimationFrame(function() {
+                        self.draw();
+                    });*/
                 }
             },
-            this.loop = function() {
-                with(this) {
-                    clear_before_move();
-                    draw();
-                    move_snake_body();
+            this.set_key_handler = function() {
+                var self = this;
+                window.onkeypress = function(ev) {
+                    self.snake.set_snake_direction(ev.key);
+                    requestAnimationFrame(function() {
+                        self.draw();
+                    });
                 }
+            },
+            this.clear_scene = function() {
+                this.context2d.beginPath();
+                this.context2d.fillStyle = this.backgroundColor;
+                this.context2d.rect(0, 0, this.max_x, this.max_y);
+                this.context2d.fill();
+                this.context2d.closePath();
+            },
+            this.draw = function() {
+                this.clear_scene();
+                this.draw_snake();
+                this.draw_candy();
             }
-
     }
 
-    var Eatme = function() {
-        this.max_x = 800,
-            this.max_y = 800,
-            this.x,
-            this.y,
-            this.item_size = 12,
-            this.isVisible = true,
-            this.canva_context,
-            this.visibleLoop,
-            this.refresh = function() {
-                with(this) {
-                    this.x = Math.floor((Math.random() * (max_x - 100)) + 50);
-                    this.y = Math.floor((Math.random() * (max_y - 100)) + 50);
-                }
-            },
-            this.create = function() {
-                with(this) {
-                    refresh();
-                    visibleLoop = setInterval(function() {
-                        isVisible = !isVisible;
-                    }, 500);
-                }
-            },
-            this.loop = function() {
-                with(this) {
-                    canva_context.beginPath();
-                    if (isVisible) {
-                        canva_context.fillStyle = "#FF4455";
-                    } else {
-                        canva_context.fillStyle = "#AABBCC";
-                    }
-                    canva_context.rect(x, y, item_size, item_size);
-                    canva_context.fill();
-                    canva_context.closePath();
-                }
-            }
-    }
+
+
     window.onload = function() {
-        var snake = new Snake();
-        var eatme = new Eatme();
-        var game_speed = 51;
-
-        snake.canva_context = document.getElementById('game').getContext("2d");
-        eatme.canva_context = snake.canva_context;
-
-        eatme.create();
-
-        window.onkeypress = function(ev) {
-            snake.setdirection(ev.key);
-        }
-
-
-        function getMainLoop() {
-            return setInterval(function() {
-                snake.loop();
-                eatme.loop();
-                if (snake.isEating(eatme) && game_speed > 10) {
-                    clearInterval(loop);
-                    game_speed = game_speed - 1;
-                    loop = getMainLoop();
-                    console.debug(game_speed);
-                }
-            }, game_speed)
-        }
-
-        var loop = getMainLoop();
-
-
-
+        var snake = new SnakeGame(document.getElementById('game').getContext("2d"));
+        snake.run();
     }
 </script>
 
