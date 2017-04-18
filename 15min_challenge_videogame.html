@@ -1,0 +1,201 @@
+<html>
+
+<head></head>
+<canvas id="game" width="800px" height="800px" />
+
+<script>
+    var Snake = function() {
+        this.type = Snake,
+            this.__prototype__ = "snake",
+            this.padding = 5,
+            this.velocity = 1,
+            this.item_size = 8,
+            this.x_move = this.velocity,
+            this.y_move = 0,
+            this.max_x = 800,
+            this.max_y = 800,
+            this.snake_body = [
+                [50, 50],
+                [45, 50],
+                [40, 50],
+                [35, 50],
+                [30, 50],
+            ],
+            this.canva_context,
+            this.move_snake_body = function() {
+                with(this) {
+                    for (i = 0; i < snake_body.length - 1; i++) {
+                        snake_body[i][0] = snake_body[i + 1][0];
+                        snake_body[i][1] = snake_body[i + 1][1];
+                    }
+                    new_x = snake_body[snake_body.length - 1][0] + x_move * (item_size + padding);
+                    new_y = snake_body[snake_body.length - 1][1] + y_move * (item_size + padding);
+                    if (new_x < 10) {
+                        new_x = max_x;
+                    } else if (new_y < 10) {
+                        new_y = max_y;
+                    } else if (new_x > max_x - 10) {
+                        new_x = 0;
+                    } else if (new_y > max_y - 10) {
+                        new_y = 0;
+                    }
+                    snake_body[snake_body.length - 1][0] = new_x;
+                    snake_body[snake_body.length - 1][1] = new_y;
+                }
+            },
+            this.clear_before_move = function() {
+                with(this) {
+                    canva_context.beginPath();
+                    canva_context.fillStyle = '#AABBCC';
+                    canva_context.rect(0, 0, max_x, max_y);
+                    canva_context.fill();
+                    canva_context.closePath();
+                    /*canva_context.fillStyle = "#FF0000";
+                    canva_context.rect(snake_body[0][0], snake_body[0][1], 4, 4);
+                    canva_context.rect(snake_body[snake_body.length - 1][0], snake_body[snake_body.length - 1], 4, 4);
+                    canva_context.fill();*/
+                }
+            },
+            this.draw = function() {
+                with(this) {
+                    snake_body.forEach(function(item) {
+                        canva_context.beginPath();
+                        canva_context.fillStyle = "#334455";
+                        canva_context.rect(item[0], item[1], item_size, item_size);
+                        canva_context.fill();
+                        canva_context.closePath();
+                    });
+
+                }
+            },
+            this.setdirection = function(direction) {
+                with(this) {
+                    switch (direction) {
+                        case "ArrowUp":
+                            y_move = -velocity;
+                            x_move = 0;
+                            break;
+                        case "ArrowDown":
+                            y_move = velocity;
+                            x_move = 0;
+                            break;
+                        case "ArrowLeft":
+                            x_move = -velocity;
+                            y_move = 0;
+                            break;
+                        case "ArrowRight":
+                            x_move = velocity;
+                            y_move = 0;
+                            break;
+                    }
+                }
+            },
+            this.makeSnakeLonger = function() {
+                with(this) {
+                    snake_body.push([snake_body[snake_body.length - 1][0] + x_move * (item_size + padding), snake_body[snake_body.length - 1][1] + y_move * (item_size + padding)]);
+                }
+            },
+            this.isEating = function(eatme) {
+                with(this) {
+                    if ((snake_body[snake_body.length - 1][0] < eatme.x + eatme.item_size && snake_body[snake_body.length - 1][0] + item_size > eatme.x &&
+                            snake_body[snake_body.length - 1][1] < eatme.y + eatme.item_size && snake_body[snake_body.length - 1][1] + item_size > eatme.y) ||
+                        (snake_body[0][0] < eatme.x + eatme.item_size && snake_body[0][0] + item_size > eatme.x &&
+                            snake_body[0][1] < eatme.y + eatme.item_size && snake_body[0][1] + item_size > eatme.y)) {
+                        makeSnakeLonger();
+                        eatme.refresh();
+                        return true;
+                    } else {
+                        /* canva_context.beginPath();
+                         canva_context.fillStyle = "#FF00FF";
+                         canva_context.rect(snake_body[snake_body.length - 1][0] - padding, snake_body[snake_body.length - 1][1] - padding, padding * 2 + item_size, padding * 2 + item_size);
+                         canva_context.fill();
+                         canva_context.closePath();*/
+                    }
+
+
+                }
+            },
+            this.loop = function() {
+                with(this) {
+                    clear_before_move();
+                    draw();
+                    move_snake_body();
+                }
+            }
+
+    }
+
+    var Eatme = function() {
+        this.max_x = 800,
+            this.max_y = 800,
+            this.x,
+            this.y,
+            this.item_size = 12,
+            this.isVisible = true,
+            this.canva_context,
+            this.visibleLoop,
+            this.refresh = function() {
+                with(this) {
+                    this.x = Math.floor((Math.random() * (max_x - 100)) + 50);
+                    this.y = Math.floor((Math.random() * (max_y - 100)) + 50);
+                }
+            },
+            this.create = function() {
+                with(this) {
+                    refresh();
+                    visibleLoop = setInterval(function() {
+                        isVisible = !isVisible;
+                    }, 500);
+                }
+            },
+            this.loop = function() {
+                with(this) {
+                    canva_context.beginPath();
+                    if (isVisible) {
+                        canva_context.fillStyle = "#FF4455";
+                    } else {
+                        canva_context.fillStyle = "#AABBCC";
+                    }
+                    canva_context.rect(x, y, item_size, item_size);
+                    canva_context.fill();
+                    canva_context.closePath();
+                }
+            }
+    }
+    window.onload = function() {
+        var snake = new Snake();
+        var eatme = new Eatme();
+        var game_speed = 51;
+
+        snake.canva_context = document.getElementById('game').getContext("2d");
+        eatme.canva_context = snake.canva_context;
+
+        eatme.create();
+
+        window.onkeypress = function(ev) {
+            snake.setdirection(ev.key);
+        }
+
+
+        function getMainLoop() {
+            return setInterval(function() {
+                snake.loop();
+                eatme.loop();
+                if (snake.isEating(eatme) && game_speed > 10) {
+                    clearInterval(loop);
+                    game_speed = game_speed - 1;
+                    loop = getMainLoop();
+                    console.debug(game_speed);
+                }
+            }, game_speed)
+        }
+
+        var loop = getMainLoop();
+
+
+
+    }
+</script>
+
+
+</html>
