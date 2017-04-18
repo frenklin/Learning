@@ -33,26 +33,27 @@
                     }
                     new_x = this.snake_body[this.snake_body.length - 1][0] + this.x_move * (this.item_size + this.padding);
                     new_y = this.snake_body[this.snake_body.length - 1][1] + this.y_move * (this.item_size + this.padding);
-                    if (new_x < this.item_size + this.padding) {
-                        new_x = this.parent.max_x - (this.item_size + this.padding);
-                    } else if (new_y < this.item_size + this.padding) {
-                        new_y = this.parent.max_y - (this.item_size + this.padding);
-                    } else if (new_x > this.parent.max_x - (this.item_size + this.padding)) {
-                        new_x = this.item_size + this.padding;
-                    } else if (new_y > this.parent.max_y - (this.item_size + this.padding)) {
-                        new_y = this.item_size + this.padding;
+                    if (new_x < 0) {
+                        new_x = this.parent.max_x - (this.padding);
+                    } else if (new_y < 0) {
+                        new_y = this.parent.max_y - (this.padding);
+                    } else if (new_x > this.parent.max_x - this.padding) {
+                        new_x = 0;
+                    } else if (new_y > this.parent.max_y - (this.padding)) {
+                        new_y = 0;
                     }
                     this.snake_body[this.snake_body.length - 1][0] = new_x;
                     this.snake_body[this.snake_body.length - 1][1] = new_y;
                 },
-                set_snake_direction: function(direction) {
-                    switch (direction) {
+                set_snake_direction: function(e) {
+                    switch (e.key) {
                         case "ArrowUp":
                             if (this.y_move > 0) {
                                 this.snake_body = this.snake_body.reverse();
                             }
                             this.y_move = -this.velocity;
                             this.x_move = 0;
+                            e.preventDefault();
                             break;
                         case "ArrowDown":
                             if (this.y_move < 0) {
@@ -60,6 +61,7 @@
                             }
                             this.y_move = this.velocity;
                             this.x_move = 0;
+                            e.preventDefault();
                             break;
                         case "ArrowLeft":
                             if (this.x_move > 0) {
@@ -67,6 +69,7 @@
                             }
                             this.x_move = -this.velocity;
                             this.y_move = 0;
+                            e.preventDefault();
                             break;
                         case "ArrowRight":
                             if (this.x_move < 0) {
@@ -74,6 +77,7 @@
                             }
                             this.x_move = this.velocity;
                             this.y_move = 0;
+                            e.preventDefault();
                             break;
                     }
                 },
@@ -129,8 +133,8 @@
             this.snake_and_candy_collided = function() {
                 this.candy.refresh_position();
                 this.snake.increase_snake();
-                if (this.snake.snake_body.timer_speed > 40) {
-                    this.snake.snake_body.timer_speed--;
+                if (this.snake.timer_speed > 30) {
+                    this.snake.timer_speed = this.snake.timer_speed - 4;
                 }
                 this.refresh_snake_timer();
             },
@@ -168,6 +172,25 @@
                 }
                 this.candy.recalc_loop = this.get_candy_timer();
             },
+            this.stop = function() {
+                if (this.candy.recalc_loop != null) {
+                    clearInterval(this.candy.recalc_loop);
+                }
+                if (this.snake.recalc_loop != null) {
+                    clearInterval(this.snake.recalc_loop);
+                }
+                this.snake.snake_body = [
+                    [50, 50],
+                    [45, 50],
+                    [40, 50],
+                    [35, 50],
+                    [30, 50],
+                ];
+                document.removeEventListener('keydown');
+                this.snake.timer_speed = 100;
+                this.is_run = false;
+
+            },
             this.run = function() {
                 if (!this.is_run) {
                     this.snake.parent = this;
@@ -178,19 +201,16 @@
                     this.refresh_snake_timer();
                     this.refresh_candy_timer();
                     this.draw();
-                    /*window.requestAnimationFrame(function() {
-                        self.draw();
-                    });*/
                 }
             },
             this.set_key_handler = function() {
                 var self = this;
-                window.onkeypress = function(ev) {
-                    self.snake.set_snake_direction(ev.key);
+                document.addEventListener('keydown', function(ev) {
+                    self.snake.set_snake_direction(ev);
                     requestAnimationFrame(function() {
                         self.draw();
                     });
-                }
+                });
             },
             this.clear_scene = function() {
                 this.context2d.beginPath();
@@ -205,8 +225,6 @@
                 this.draw_candy();
             }
     }
-
-
 
     window.onload = function() {
         var snake = new SnakeGame(document.getElementById('game').getContext("2d"));
