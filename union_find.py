@@ -9,7 +9,6 @@ import random
 import numpy
 import matplotlib.pyplot as plt
 
-STEPS = 500
 
 class QuickFind:    
     def __init__(self, n):
@@ -88,55 +87,66 @@ class WeightedQuickUnion:
             print("Overflow Exception")
 
 
-def quick_find_union_test(n):
+def quick_find_test(n):
     test = QuickFind(n)
-    for i in range(0, n):
-        test.union(i, random.randint(0, n-1))
-
-def quick_union_union_test(n):
-    test = QuickUnion(n)
-    for i in range(0, n):
-        test.union(i, random.randint(0, n-1))
-
-def quick_union_connected_test(n):
-    test = QuickUnion(n)
-    for i in range(0, n):
-        test.connected(i, random.randint(0, n-1))
-
-def weighted_quick_union_union_test(n):
-    test = WeightedQuickUnion(n)
-    for i in range(0, n):
-        test.union(i, random.randint(0, n-1))
-
-def weighted_quick_union_connected_test(n):
-    test = WeightedQuickUnion(n)
-    for i in range(0, n):
-        test.connected(i, random.randint(0, n-1))
-
-
-def get_calc_time(func, steps):
-    """Mesure computation time"""
     start_calc = time.process_time()
-    result = []
-    for i in range(1, steps):
-        func(i)
-        result.append(time.process_time()-start_calc)
-    return result
+    for i in range(0, n):
+        test.union(0, random.randint(i, n-1))
+    union_time = time.process_time()-start_calc
+    start_calc = time.process_time()
+    for i in range(0, n):
+        test.connected(0, random.randint(i, n-1))
+    connected_time = time.process_time()-start_calc
+    return union_time, connected_time
 
-def run_and_plot(steps):
+def quick_union_test(n):
+    test = QuickUnion(n)
+    start_calc = time.process_time()
+    for i in range(0, n):
+        test.union(0, random.randint(i, n-1))
+    union_time = time.process_time()-start_calc
+    start_calc = time.process_time()
+    for i in range(0, n):
+        test.connected(0, random.randint(i, n-1))
+    connected_time = time.process_time()-start_calc
+    return union_time, connected_time
+
+def weighted_quick_union_test(n):
+    test = WeightedQuickUnion(n)
+    start_calc = time.process_time()
+    for i in range(0, n):
+        test.union(0, random.randint(i, n-1))
+    union_time = time.process_time()-start_calc
+    start_calc = time.process_time()
+    for i in range(0, n):
+        test.connected(0, random.randint(i, n-1))
+    connected_time = time.process_time()-start_calc
+    return union_time, connected_time
+
+def get_calc_time(func, time_limit):
+    result1 = []
+    result2 = []
+    start_calc = time.process_time()
+    i=0
+    while time.process_time()-start_calc < time_limit:
+        i=i+1
+        (r1, r2) = func(i)
+        result1.append(r1)
+        result2.append(r2)
+    return result1, result2
+
+def run_and_plot():
     """Run & plot"""
-    plot1 = get_calc_time(quick_find_union_test, steps)
-    plot2 = get_calc_time(quick_union_union_test, steps)
-    plot3 = get_calc_time(quick_union_connected_test, steps)
-
-    plot4 = get_calc_time(weighted_quick_union_union_test, steps)
-    plot5 = get_calc_time(weighted_quick_union_connected_test, steps)
-
+    (plot1, plot2) = get_calc_time(quick_find_test, 100)
+    (plot3, plot4) = get_calc_time(quick_union_test, 100)
+    (plot5, plot6) = get_calc_time(weighted_quick_union_test, 100)
+    
     plt.plot(plot1, label="Quick Find Union Time")
-    plt.plot(plot2, label="Quick Union Union Time")
-    plt.plot(plot3, label="Quick Union Connected Time")
-    plt.plot(plot4, label="Weighted Quick Union Union Time")
-    plt.plot(plot5, label="Weighted Quick Union Connected Time")
+    plt.plot(plot2, label="Quick Find Connected Time")
+    plt.plot(plot3, label="Quick Union Union Time")
+    plt.plot(plot4, label="Quick Union Connected Time")
+    plt.plot(plot5, label="Weighted Quick Union Union Time")
+    plt.plot(plot6, label="Weighted Quick Union Connected Time")
 
     plt.tight_layout()
     plt.legend()
@@ -177,5 +187,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         print('Nope args')
 
-    run_and_plot(STEPS)
+    run_and_plot()
     
