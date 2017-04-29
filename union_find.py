@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 
 
 class QuickFind:
+    """worst case time M*N"""
     def __init__(self, n):
         self.n = n
         self.arr = numpy.arange(n, dtype=int)
@@ -33,6 +34,7 @@ class QuickFind:
 
 
 class QuickUnion:
+    """worst case time M*N"""
     def __init__(self, n):
         self.n = n
         self.arr = numpy.arange(n, dtype=int)
@@ -57,6 +59,7 @@ class QuickUnion:
 
 
 class WeightedQuickUnion(QuickUnion):
+    """worst case time N + M*log(N)"""
     def __init__(self, n):
         self.arr_weigths = {}
         super().__init__(n)
@@ -75,7 +78,8 @@ class WeightedQuickUnion(QuickUnion):
             print("Overflow Exception")
 
 class WeightedQuickUnionWithPathCompression(WeightedQuickUnion):
-    def root(self, i):
+    """worst case time N + M*lg(N)"""
+    def root(self, i):        
         while i != self.arr[i]:
             self.arr[i] = self.arr[self.arr[i]]
             i = self.arr[i]
@@ -86,11 +90,11 @@ def quick_find_test(n):
     test = QuickFind(n)
     start_calc = time.process_time()
     for i in range(0, n):
-        test.union(0, random.randint(i, n-1))
+        test.union(i, random.randint(i, n-1))
     union_time = time.process_time()-start_calc
     start_calc = time.process_time()
     for i in range(0, n):
-        test.connected(0, random.randint(i, n-1))
+        test.connected(i, random.randint(i, n-1))
     connected_time = time.process_time()-start_calc
     return union_time, connected_time
 
@@ -98,11 +102,11 @@ def quick_union_test(n):
     test = QuickUnion(n)
     start_calc = time.process_time()
     for i in range(0, n):
-        test.union(0, random.randint(i, n-1))
+        test.union(i, random.randint(i, n-1))
     union_time = time.process_time()-start_calc
     start_calc = time.process_time()
     for i in range(0, n):
-        test.connected(0, random.randint(i, n-1))
+        test.connected(i, random.randint(i, n-1))
     connected_time = time.process_time()-start_calc
     return union_time, connected_time
 
@@ -110,11 +114,11 @@ def weighted_quick_union_test(n):
     test = WeightedQuickUnion(n)
     start_calc = time.process_time()
     for i in range(0, n):
-        test.union(0, random.randint(i, n-1))
+        test.union(i, random.randint(i, n-1))
     union_time = time.process_time()-start_calc
     start_calc = time.process_time()
     for i in range(0, n):
-        test.connected(0, random.randint(i, n-1))
+        test.connected(i, random.randint(i, n-1))
     connected_time = time.process_time()-start_calc
     return union_time, connected_time
 
@@ -122,11 +126,11 @@ def weighted_quick_union_with_path_compression_test(n):
     test = WeightedQuickUnionWithPathCompression(n)
     start_calc = time.process_time()
     for i in range(0, n):
-        test.union(0, random.randint(i, n-1))
+        test.union(i, random.randint(i, n-1))
     union_time = time.process_time()-start_calc
     start_calc = time.process_time()
     for i in range(0, n):
-        test.connected(0, random.randint(i, n-1))
+        test.connected(i, random.randint(i, n-1))
     connected_time = time.process_time()-start_calc
     return union_time, connected_time
 
@@ -135,7 +139,7 @@ def get_calc_time(func, time_limit):
     result1 = []
     result2 = []
     start_calc = time.process_time()
-    i = 0
+    i = 100
     while time.process_time()-start_calc < time_limit:
         i = i+1
         (union_time, connected_time) = func(i)
@@ -145,10 +149,10 @@ def get_calc_time(func, time_limit):
 
 def run_and_plot():
     """Run & plot"""
-    (plot1, plot2) = get_calc_time(quick_find_test, 50)
-    (plot3, plot4) = get_calc_time(quick_union_test, 50)
-    (plot5, plot6) = get_calc_time(weighted_quick_union_test, 50)
-    (plot7, plot8) = get_calc_time(weighted_quick_union_with_path_compression_test, 50)
+    (plot1, plot2) = get_calc_time(quick_find_test, 150)
+    (plot3, plot4) = get_calc_time(quick_union_test, 150)
+    (plot5, plot6) = get_calc_time(weighted_quick_union_test, 150)
+    (plot7, plot8) = get_calc_time(weighted_quick_union_with_path_compression_test, 150)
     
     plt.plot(plot1, label="Quick Find Union Time")
     plt.plot(plot2, label="Quick Find Connected Time")
