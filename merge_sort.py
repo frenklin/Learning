@@ -1,15 +1,12 @@
 #!/usr/bin/env python
-"""MergeSort algorthms"""
+"""MergeSort algorithms"""
 __author__ = "Roman S"
 __copyright__ = "Copyleft"
-
 
 import sys
 import math
 import queue
 import numpy as np
-
-
 
 class MergeSort:
     def Sort(self, arr):
@@ -31,7 +28,7 @@ class MergeSort:
             return np.append(ar2[0], self._merge(ar1, ar2[1:]))
 
 
-class IterativeMergeSort(MergeSort):    
+class IterativeMergeSort(MergeSort):
     def Sort(self, arr):
         q = queue.Queue(len(arr))
         for i in range(0, len(arr)):
@@ -43,12 +40,12 @@ class IterativeMergeSort(MergeSort):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        print('Nope args')    
-    
+        print('Nope args')
+
     t1 = MergeSort()
     t2 = IterativeMergeSort()
-    test = [5,7,9,3,21,7,8,9,0,5,4,3,2,1,2,4,6,7,8,9,0]
-        
+    test = [5, 7, 9, 3, 21, 7, 8, 9, 0, 5, 4, 3, 2, 1, 2, 4, 6, 7, 8, 9, 0]
+
     res = t1.Sort(test)
     res2 = t2.Sort(test)
 
