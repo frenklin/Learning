@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Search triangles in graph"""
+"""Search Binary Heap"""
 __author__ = "Roman S"
 __copyright__ = "Copyleft"
 
