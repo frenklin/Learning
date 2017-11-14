@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-"""Search Binary Heap"""
-__author__ = "Roman S"
-__copyright__ = "Copyleft"
+"""Binary Heap"""
+
 
 import sys
 import numpy as np
