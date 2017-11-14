@@ -2,22 +2,32 @@
 
 
 def convert(s, numRows):
-        if len(s) is 0:
-            return ""
-        if numRows == 0 or numRows == 1 or len(s)<=numRows:
-            return s
-        result = ""
-        bottomIndexes = getBottomIndexes(s, numRows)    
-        for row in range(0, numRows):
-            if row is numRows-1 or row is 0:                
-                result = result + ''.join([s[i] for i in range(row, len(s), 2*numRows-2)])
-            else:
-                for i in bottomIndexes:            
-                    result = result + ''.join((s[i-numRows+row+1] if i-numRows+row+1<len(s) else '') + (s[i+numRows-row-1] if i+numRows-row-1<len(s) else ''))                    
-        return result[:len(s)]
+    if len(s) is 0:
+        return ""
+    if numRows == 0 or numRows == 1 or len(s)<=numRows:
+        return s
+    result = ""
+    bottomIndexes = getBottomIndexes(s, numRows)    
+    for i in range(0, numRows):
+        result = result + ''.join(getRow(i, s, numRows,bottomIndexes))
+    return result[:len(s)]
+
+def getRow(row, s, rows, bottomIndexes):
+    if row is rows-1 or row is 0:
+        return [s[i] for i in range(row, len(s), 2*rows-2)]
+    else:   
+        result = ""     
+        for i in bottomIndexes:
+            result = result + getPair(i, row, rows, s)
+    return result
 
 def getBottomIndexes(s, rows):
-    return [i for i in range(rows-1, len(s)+rows, 2*rows-2)]
+    return [i for i in range(rows-1, len(s)+rows-1, 2*rows-2)]
+
+
+def getPair(i, row, rows, s):    
+    return (s[i-rows+row+1] if i-rows+row+1<len(s) else '') + (s[i+rows-row-1] if i+rows-row-1<len(s) else '')    
+        
 
     
 n = 503
@@ -43,6 +53,7 @@ assert(len(s) == len(c))
 assert(convert("PAYPALISHIRING", 3) == "PAHNAPLSIIGYIR")
 assert(convert("PAYPALISHIRING", 4) == "PINALSIGYAHRPI")
 assert(convert("ABCDEF", 3) == "AEBDFC")
+assert(convert("hjouvsuyoypayulyeimuotehzriicfskpggkbbipzzrzucxamludfykgruowzgiooobppleqlwphapjnadqhdcnvwdtxjbmyppphauxnspusgdhiixqmbfjxjcvudjsuyibyebmwsiqyoygyxymzevypzvjegebeocfuftsxdixtigsieehkchzdflilrjqfnxztqrsvbspkyhsenbppkqtpddbuotbbqcwivrfxjujjddntgeiqvdgaijvwcyaubwewpjvygehljxepbpiwuqzdzubdubzvafspqpqwuzifwovyddwyvvburczmgyjgfdxvtnunneslsplwuiupfxlzbknhkwppanltcfirjcddsozoyvegurfwcsfmoxeqmrjowrghwlkobmeahkgccnaehhsveymqpxhlrnunyfdzrhbasjeuygafoubutpnimuwfjqsjxvkqdorxxvrwctdsneogvbpkxlpgdirbfcriqifpgynkrrefx", 503) == "hjouvsuyoypayulyeimuotehzriicfskpggkbbipzzrzucxamludfykgruowzgiooobppleqlwphapjnadqhdcnvwdtxjbmyppphauxnspusgdhiixqmbfjxjcvudjsuyibyebmwsiqyoygyxymzevypzvjegebeocfuftsxdixtigsieehkchzdflilrjqfnxztqrsvbspkyhsenbppkqtpddbuotbbqcwivrfxjujjddntgeiqvdgaijvwcyaubwewpjvygehljxepbpiwuqzdzubdubzvafspqpqwuzifwovyddwyvvburczmgyjgfdxvtnunneslsplwuiupfxlzbknhkwppanltcfirjcddsozoyvegurfwcsfmoxeqmrjowrghwlkobmeahkgccnaehhsveymqpxhlrnunyfdzrhbasjeuygafoubutpnimuwfjqsjxvkqdorxxvrwctdsneogvbpkxlpgdirbfcriqifpgynkrxrfe")
 
 #3
 #3
