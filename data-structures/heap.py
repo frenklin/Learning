@@ -85,8 +85,12 @@ class BinaryHeap:
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         print('Nope args')
-
+    
+    
     bh1 = BinaryHeap.fromlist([9,5,6,2,3,17])    
+    print(bh1.heap)
+    exit(0)
+    
     bh2 = BinaryHeap.fromlist([10,1,18,9,30,19])    
     bh = bh1 + bh2
     #print(bh1.merge(bh2))

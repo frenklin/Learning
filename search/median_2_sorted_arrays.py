@@ -1,36 +1,35 @@
 #!/usr/bin/env python
 
 """"""
+MAX_VALUE = 1000000000
 
-
+def kthElement(A, startA, B, startB, k):
+    if len(A)-1 < startA:
+        return B[startB+k-1]
+    if len(B)-1 < startB:
+        return A[startA+k-1]
+    if k==1: 
+        return min(A[startA], B[startB])
+    
+    midA=A[startA+k//2-1] if startA+k//2-1 < len(A) else MAX_VALUE;
+    midB=B[startB+k//2-1] if startB+k//2-1 < len(B) else MAX_VALUE;
+    
+    if midA<midB:
+        return kthElement(A, startA+k//2, B, startB, k-k//2)
+    else:
+        return kthElement(A, startA, B, startB+k//2, k-k//2)
+        
 def med(arr1, arr2):
-    m, n = len(arr1), len(arr2)
-    if m > n:
-        arr1, arr2, m, n = arr2, arr1, n, m
-    if n == 0:
-        raise ValueError
-
-    imin, imax, half_len = 0, m, (m + n + 1) / 2
-    while imin <= imax:
-        i = int((imin + imax) / 2)
-        j = int(half_len - i)
-        if i < m and arr2[j-1] > arr1[i]: 
-            imin = i + 1
-        elif i > 0 and arr1[i-1] > arr2[j]:
-            imax = i - 1
-        else:
-            if i == 0: max_of_left = arr2[j-1]
-            elif j == 0: max_of_left = arr1[i-1]
-            else: max_of_left = max(arr1[i-1], arr2[j-1])
-
-            if (m + n) % 2 == 1:
-                return max_of_left
-
-            if i == m: min_of_right = arr2[j]
-            elif j == n: min_of_right = arr1[i]
-            else: min_of_right = min(arr1[i], arr2[j])
-
-            return (max_of_left + min_of_right) / 2.0
+    """
+    :type nums1: List[int]
+    :type nums2: List[int]
+    :rtype: float
+    """            
+    n=len(arr1)
+    m=len(arr2)
+    l=(m+n+1)//2
+    r=(m+n+2)//2
+    return (kthElement(arr1,0,arr2,0,l)+kthElement(arr1,0,arr2,0,r))/2.0      
 
 
 ar1 = [1,2]
