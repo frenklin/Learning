@@ -1,13 +1,18 @@
 #!/usr/bin/env python
 
-
 class SudokuSolver:
     
     def  __init__(self):
         self.row_mask = 9*[0]
         self.col_mask = 9*[0]
-        self.area_mask = 9*[0]   
-        
+        self.area_mask = 9*[0]
+    
+    def toggleBit(self, i, row, col, area):    
+        self.row_mask[row] = self.row_mask[row] ^ 1 << i
+        self.col_mask[col] = self.col_mask[col] ^ 1 << i
+        self.area_mask[area] = self.area_mask[area] ^ 1 << i  
+        return
+    
     def load_masks(self, board):
         for r in range(0, 9):
             for c in range(0, 9):
@@ -20,13 +25,12 @@ class SudokuSolver:
                 if self.row_mask[r] >> idx & 1 or self.col_mask[c] >> idx & 1 or self.area_mask[area] >> idx & 1:
                     return False
                 
-                self.row_mask[r] = self.row_mask[r] | 1 << idx
-                self.col_mask[c] = self.col_mask[c] | 1 << idx
-                self.area_mask[area] = self.area_mask[area] | 1 << idx
+                self.toggleBit(idx, r, c, area)                
                 
         return True                
                 
-    def solveSudoku(self, board):               
+    def solveSudoku(self, board):              
+        
         if not self.load_masks(board):
             return None
         
@@ -50,23 +54,17 @@ class SudokuSolver:
             if self.row_mask[row] >> i  & 1 or self.col_mask[col] >> i & 1 or self.area_mask[area] >> i & 1:
                 continue            
             
-            board[row][col] = i + 1
-            self.row_mask[row] = self.row_mask[row] | 1 << i
-            self.col_mask[col] = self.col_mask[col] | 1 << i
-            self.area_mask[area] = self.area_mask[area] | 1 << i
+            board[row][col] = str(i + 1)
+            self.toggleBit(i, row, col, area)             
 
-            if self.solve(board, row, col+1):
+            if self.solve(board, row, col + 1):
                 return True            
 
             #backtrace
             board[row][col] = '.'
-            
-            self.row_mask[row] = self.row_mask[row] ^ 1 << i
-            self.col_mask[col] = self.col_mask[col] ^ 1 << i
-            self.area_mask[area] = self.area_mask[area] ^ 1 << i            
+            self.toggleBit(i, row, col, area)             
         
         return False
-    
 
 
 
