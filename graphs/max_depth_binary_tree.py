@@ -3,7 +3,6 @@ from queue import Queue
 from threading import Thread
 
 
-# Definition for a binary tree node.
 class TreeNode(object):
     def __init__(self, x):
         self.val = x
@@ -20,7 +19,7 @@ class Solution(object):
         qnodes = Queue()
         results = Queue()
         qnodes.put((root, 1))
-        for x in range(1): 
+        for x in range(8): 
             worker = TreeNodeVisitorTask(qnodes, results)
             worker.daemon = True
             worker.start()
