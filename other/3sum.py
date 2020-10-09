@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 
-def threeSum(nums):    
+def threeSum(nums):
     nums.sort()
-    result = []        
-    i = 0        
+    result = []
+    i = 0
     while i<len(nums)-2:
         if nums[i] > 0:
             break
         start = i + 1
         end = len(nums) - 1
-        while start < end:            
+        while start < end:
             s = nums[i] + nums[end] + nums[start]
             if s == 0:
-                result.append([nums[i], nums[end], nums[start]])                               
+                result.append([nums[i], nums[end], nums[start]])
             if  s >= 0:
                 while  start < end and nums[end] == nums[end - 1]:
                     end -= 1
@@ -20,7 +20,7 @@ def threeSum(nums):
             if  s <= 0:
                 while start < end and nums[start] == nums[start + 1]:
                     start += 1
-                start += 1                                
+                start += 1
         while i<len(nums)-2 and nums[i]==nums[i+1]:
             i+=1
         i += 1
@@ -28,6 +28,27 @@ def threeSum(nums):
     return result
 
 #print(threeSum([0,0,0]))
+def threeSum2(nums: List[int]) -> List[List[int]]:
+    res = []
+    nums.sort()
+
+    for i, a in enumerate(nums):
+        if i > 0 and a == nums[i - 1]:
+            continue
+
+        l, r = i + 1, len(nums) - 1
+        while l < r:
+            threeSum = a + nums[l] + nums[r]
+            if threeSum > 0:
+                r -= 1
+            elif threeSum < 0:
+                l += 1
+            else:
+                res.append([a, nums[l], nums[r]])
+                l += 1
+                while nums[l] == nums[l - 1] and l < r:
+                    l += 1
+    return res
 
 #exit(0)
 
