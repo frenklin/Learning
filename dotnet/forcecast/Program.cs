@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Collections;
-using System.Net.Http.Headers;
 
 namespace forcecast
 {
@@ -49,6 +47,13 @@ namespace forcecast
                 return __refvalue(tr, TOut);
             }
         }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class PinObj<T>
+    {
+        public bool Pin;
+        public T TObj;
     }
 
     public class ArrayInitializer : IEnumerable
